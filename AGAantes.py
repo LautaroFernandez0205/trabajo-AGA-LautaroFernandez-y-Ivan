@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.optimize import milp, LinearConstraint, Bounds
 
 # ==========================
-# CONFIG
+# CONFIGURACIÓN
 # ==========================
 
 st.set_page_config(
@@ -28,49 +28,48 @@ h1, h2, h3, h4, h5, h6, p, label, div {
 st.title("📶 Optimización de Red Wi-Fi del Campus")
 
 # ==========================
-# RESET DE ESTADO
-# ==========================
-
-if "reset" not in st.session_state:
-    st.session_state.reset = False
-
-def reset_values():
-    st.session_state.reset = True
-
-# ==========================
 # PROBLEMA
 # ==========================
 
-st.subheader("📌 Problema")
+st.subheader("📌 Enunciado del problema")
 
 st.write("""
-Se busca maximizar la cantidad de usuarios cubiertos por una red Wi-Fi
-instalando antenas, repetidores y baterías bajo restricciones de presupuesto,
-energía y espacio.
+La universidad busca optimizar la instalación de infraestructura Wi-Fi en el campus
+con el objetivo de maximizar la cantidad de usuarios cubiertos.
+
+Se dispone de distintos equipos de red:
+
+- Antenas Tipo A
+- Antenas Tipo B
+- Repetidores
+- Baterías
+
+Cada equipo tiene un costo, consumo energético, ocupación de espacio físico
+y contribuye a la cobertura total del sistema.
 """)
 
 # ==========================
-# DATOS BASE
+# RESTRICCIONES (CON NÚMEROS)
 # ==========================
 
-default_data = pd.DataFrame({
-    "Equipo": [
-        "Antena Tipo A",
-        "Antena Tipo B",
-        "Repetidor",
-        "Batería"
-    ],
-    "Usuarios cubiertos": [120, 200, 80, 20],
-    "Precio ($)": [300, 500, 150, 100],
-    "Energía (W)": [8, 15, 4, 2],
-    "Espacio (m²)": [10, 12, 1, 1]
-})
+st.subheader("⚙️ Restricciones del problema")
+
+st.markdown("""
+El sistema debe respetar las siguientes restricciones:
+
+- 💰 Presupuesto máximo: **$7000**
+- ⚡ Energía máxima disponible: **220 W**
+- 📦 Espacio máximo disponible: **300 m²**
+- 🔋 Mínimo de baterías: **5**
+- 📡 Mínimo de antenas (A + B): **2**
+- 🔢 Variables enteras (no se permiten fracciones)
+""")
 
 # ==========================
 # PARÁMETROS
 # ==========================
 
-st.subheader("⚙️ Parámetros")
+st.subheader("⚙️ Parámetros ajustables")
 
 col1, col2 = st.columns(2)
 
@@ -84,10 +83,23 @@ with col2:
     min_antenas = st.number_input("Mínimo antenas", value=2)
 
 # ==========================
-# TABLA EDITABLE
+# DATOS BASE
 # ==========================
 
-st.subheader("📋 Equipos")
+st.subheader("📋 Equipos disponibles")
+
+default_data = pd.DataFrame({
+    "Equipo": [
+        "Antena Tipo A",
+        "Antena Tipo B",
+        "Repetidor",
+        "Batería"
+    ],
+    "Usuarios cubiertos": [120, 200, 80, 20],
+    "Precio ($)": [300, 500, 150, 100],
+    "Energía (W)": [8, 15, 4, 2],
+    "Espacio (m²)": [10, 12, 1, 1]
+})
 
 datos = st.data_editor(default_data, use_container_width=True, num_rows="fixed")
 
@@ -121,21 +133,14 @@ espacio_Bat = datos.iloc[3]["Espacio (m²)"]
 
 colA, colB = st.columns(2)
 
-with colA:
-    ejecutar = st.button("🚀 Ejecutar Optimización")
+ejecutar = colA.button("🚀 Ejecutar Optimización")
+reset = colB.button("🔄 Reset")
 
-with colB:
-    st.button("🔄 Reset valores", on_click=reset_values)
-
-# ==========================
-# RESET LOGIC
-# ==========================
-
-if st.session_state.reset:
+if reset:
     st.rerun()
 
 # ==========================
-# OPTIMIZACIÓN
+# MODELO
 # ==========================
 
 if ejecutar:
@@ -182,8 +187,10 @@ if ejecutar:
         col3.metric("Energía (W)", energia)
         col4.metric("Espacio (m²)", espacio)
 
+        st.subheader("📦 Solución óptima")
+
         st.dataframe(pd.DataFrame({
-            "Equipo": ["A", "B", "R", "Batería"],
+            "Equipo": ["Antena A", "Antena B", "Repetidor", "Batería"],
             "Cantidad": [A_ant, B_ant, R_rep, Bat]
         }), use_container_width=True)
 
@@ -191,7 +198,7 @@ if ejecutar:
             "Cantidad": [A_ant, B_ant, R_rep, Bat]
         }, index=["A", "B", "R", "Bat"]))
 
-        st.success("Optimización completada")
+        st.success("Optimización completada correctamente")
 
     else:
-        st.error("No se encontró solución factible")
+        st.error("No se encontró solución factible con los parámetros actuales.")
