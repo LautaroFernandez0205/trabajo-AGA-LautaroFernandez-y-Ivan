@@ -94,7 +94,7 @@ datos = pd.DataFrame({
         "Repetidor",
         "Batería"
     ],
-    "Cobertura": [120, 200, 80, 20],
+    "Usuarios cubiertos": [120, 200, 80, 20],
     "Precio": [300, 500, 150, 100],
     "Energía": [8, 15, 4, 2],
     "Espacio": [10, 12, 1, 1]
@@ -106,22 +106,22 @@ datos = st.data_editor(
     num_rows="fixed"
 )
 
-cov_A = datos.iloc[0]["Cobertura"]
+cov_A = datos.iloc[0]["Usuarios cubiertos"]
 precio_A = datos.iloc[0]["Precio"]
 energia_A = datos.iloc[0]["Energía"]
 espacio_A = datos.iloc[0]["Espacio"]
 
-cov_B = datos.iloc[1]["Cobertura"]
+cov_B = datos.iloc[1]["Usuarios cubiertos"]
 precio_B = datos.iloc[1]["Precio"]
 energia_B = datos.iloc[1]["Energía"]
 espacio_B = datos.iloc[1]["Espacio"]
 
-cov_R = datos.iloc[2]["Cobertura"]
+cov_R = datos.iloc[2]["Usuarios cubiertos"]
 precio_R = datos.iloc[2]["Precio"]
 energia_R = datos.iloc[2]["Energía"]
 espacio_R = datos.iloc[2]["Espacio"]
 
-cov_Bat = datos.iloc[3]["Cobertura"]
+cov_Bat = datos.iloc[3]["Usuarios cubiertos"]
 precio_Bat = datos.iloc[3]["Precio"]
 energia_Bat = datos.iloc[3]["Energía"]
 espacio_Bat = datos.iloc[3]["Espacio"]
@@ -211,10 +211,10 @@ if st.button("🚀 Ejecutar Optimización"):
 
         col1, col2, col3, col4 = st.columns(4)
 
-        col1.metric("Cobertura Máxima", cobertura)
-        col2.metric("Costo Utilizado", f"${costo}")
-        col3.metric("Energía Utilizada", energia)
-        col4.metric("Espacio Utilizado", espacio)
+        col1.metric("Usuarios cubiertos", cobertura)
+        col2.metric("Costo utilizado", f"${costo}")
+        col3.metric("Energía utilizada", energia)
+        col4.metric("Espacio utilizado", espacio)
 
         resultados = pd.DataFrame({
             "Equipo": [
@@ -223,7 +223,7 @@ if st.button("🚀 Ejecutar Optimización"):
                 "Repetidor",
                 "Batería"
             ],
-            "Cantidad Óptima": [
+            "Cantidad óptima": [
                 antena_a,
                 antena_b,
                 repetidor,
@@ -231,13 +231,11 @@ if st.button("🚀 Ejecutar Optimización"):
             ]
         })
 
-        st.subheader("Cantidad Óptima de Equipos")
+        st.subheader("Cantidad óptima de equipos")
         st.dataframe(resultados, use_container_width=True)
 
         st.subheader("Gráfico")
-        st.bar_chart(
-            resultados.set_index("Equipo")
-        )
+        st.bar_chart(resultados.set_index("Equipo"))
 
         st.success("Optimización completada correctamente")
 
